@@ -1,0 +1,46 @@
+﻿<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<div class="container">
+    <h1>Productos</h1>
+    <a href="@Url.Action("AdicionarUsuario", "VistasWeb")" class="btn btn-primary">Agregar Producto</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombres</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th>Identificacion</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+            </tr>
+        </thead>
+        <tbody id="usuariosBody"></tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/api/getusuarios',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                const usuariosBody = $('#usuariosBody');
+                data.forEach(usuarios => {
+                    var rolTexto = usuarios.Rol === 1 ? "Administrador" : "Usuario/Cliente";
+                    const row = $('<tr></tr>');
+                    row.append(`<td>${usuarios.Nombres}</td>`);
+                    row.append(`<td>${usuarios.Direccion}</td>`);
+                    row.append(`<td>${usuarios.Telefono}</td>`);
+                    row.append(`<td>${usuarios.Identificacion}</td>`);
+                    row.append(`<td>${usuarios.UsuarioLog}</td>`);
+                    row.append(`<td>${rolTexto}</td>`);
+                    usuariosBody.append(row);
+                });
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    });
+</script>

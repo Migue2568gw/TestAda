@@ -1,0 +1,99 @@
+﻿
+<link href="~/Content/CarritoCompras.css" rel="stylesheet" />
+<br />
+<br />
+<div id="productosContainer"></div>
+<button id="realizarPedidoBtn">Realizar Pedido</button>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    var pedido = [];
+    var usuarioId = @(((Tesy_ADA.Models.Usuario)Session["usuarioEncontrado"]).UsuarioId);
+
+    $.get("/api/getproducto", function (data) {
+        var productosContainer = $("#productosContainer");
+
+        $.each(data, function (index, producto) {
+            var productoContainer = $("<div>").addClass("producto-container");
+
+            var productoInfo = $("<div>").addClass("producto-info");
+            var nombreProducto = $("<div>").addClass("producto-nombre").text(producto.Nombre);
+            var descripcionProducto = $("<div>").addClass("producto-descripcion").text(producto.Descripcion);
+            var CantidadProducto = $("<div>").addClass("producto-cantidad").text(producto.CantidadDisponible);
+            productoInfo.append(nombreProducto, descripcionProducto, CantidadProducto);
+
+            var counterContainer = $("<div>").addClass("counter-container");
+            var decrementButton = $("<span>").addClass("counter-btn").text("-");
+            var counterValue = $("<span>").addClass("counter-value").text("0");
+            var incrementButton = $("<span>").addClass("counter-btn").text("+");
+            counterContainer.append(decrementButton, counterValue, incrementButton);
+
+            productoContainer.append(productoInfo, counterContainer);
+
+            productosContainer.append(productoContainer);
+
+            var cantidad = 0;
+            incrementButton.click(function () {
+                cantidad++;
+                counterValue.text(cantidad);
+                updateCantidadEnPedido(producto.ProductoId, cantidad);
+            });
+            decrementButton.click(function () {
+                if (cantidad > 0) {
+                    cantidad--;
+                    counterValue.text(cantidad);
+                    updateCantidadEnPedido(producto.ProductoId, cantidad);
+                }
+            });
+
+            productoContainer.data("productoId", producto.ProductoId);
+
+            pedido.push({
+                ProductoId: producto.ProductoId,
+                Cantidad: cantidad,
+                UsuarioId: usuarioId
+            });
+        });
+
+        $("#realizarPedidoBtn").click(function () {
+            var todosCero = pedido.every(function (elem) {
+                return elem.Cantidad === 0;
+            });
+
+            if (todosCero) {
+                alert("Seleccione y agregue al menos un pedido al carrito.");
+            } else {
+                var confirmar = confirm("¿Realmente desea comprar el producto y la cantidad disponible?");
+
+                if (confirmar) {
+                    $.ajax({
+                        url: "/api/generartransaccion",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(pedido),
+                        success: function (response) {
+                            $("#result").text(response);
+                            console.log(response);
+                            if (response.Codigo === 200) {
+                                location.reload();
+                            }
+                        }
+                    });
+                } else {}
+            }
+        });
+
+
+        function updateCantidadEnPedido(productoId, cantidad) {
+            for (var i = 0; i < pedido.length; i++) {
+                if (pedido[i].ProductoId === productoId) {
+                    pedido[i].Cantidad = cantidad;
+                    break;
+                }
+            }
+        }
+    });
+});
+
+</script>

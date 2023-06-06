@@ -1,0 +1,76 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Carrito de Compras</title>
+    <link href="~/Content/Login.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+
+    <form id="usuarioForm">
+        <h1>Adicionar Usuario</h1>
+        <label for="nombres">Nombres:</label>
+        <input type="text" id="nombres" name="nombres" required maxlength="20"><br>
+
+        <label for="direccion">Dirección:</label>
+        <input type="text" id="direccion" name="direccion" required maxlength="20"><br>
+
+        <label for="telefono">Teléfono:</label>
+        <input type="number" id="telefono" name="telefono" oninput="limitarDigitos(this, 10)" required><br>
+
+        <label for="identificacion">Identificación:</label>
+        <input type="number" id="identificacion" name="identificacion" oninput="limitarDigitos(this, 10)" required><br>
+
+        <label for="usuarioLog">Usuario:</label>
+        <input type="text" id="usuarioLog" name="usuarioLog" required maxlength="10"><br>
+
+        <label for="contrasena">Contraseña:</label>
+        <input type="password" id="contrasena" name="contrasena" required maxlength="10"><br>
+
+        <div class="button-container">
+            <div class="btn1"><input type="button" onclick="location.href='@Url.Action("Login", "VistasWeb")'" value="Volver"></div>
+            <div class="btn2"><input type="submit" value="Adicionar Usuario"></div>
+        </div>
+    </form>
+    <div id="result"></div>
+    <script>
+        $("#usuarioForm").submit(function (event) {
+            event.preventDefault();
+
+            var usuario = {
+                Nombres: $("#nombres").val(),
+                Direccion: $("#direccion").val(),
+                Telefono: $("#telefono").val(),
+                Identificacion: $("#identificacion").val(),
+                UsuarioLog: $("#usuarioLog").val(),
+                Contrasena: $("#contrasena").val()
+            };
+
+            $.ajax({
+                url: "/api/AdicionarUsuario",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(usuario),
+                success: function (response) {
+                    $("#result").text(response.Mensaje);
+                    if (response.Mensaje === 'Usuario Creado Correctamente') {
+                        setTimeout(function () {
+                            window.location.href = "@Url.Action("Login", "VistasWeb")";
+                        }, 2000);
+                    }
+                }
+            });
+        });
+
+        function limitarDigitos(elemento, maxDigitos) {
+            if (elemento.value.length > maxDigitos) {
+                elemento.value = elemento.value.slice(0, maxDigitos);
+            }
+        }
+    </script>
+</body>
+</html>
+

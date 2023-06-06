@@ -1,0 +1,105 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Carrito de Compras</title>
+    <link href="~/Content/Login.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+    <form>
+        <h1>Iniciar Sesión</h1>
+        <label for="username">Nombre de usuario:</label>
+        <input type="text" id="username" name="username" required>
+        <br><br>
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" name="password" required>
+        <br><br>
+        <div class="button-container">
+            <div class="btn1"><button type="button" id="btnEnviar">Ingresar</button></div>
+            <div class="btn2"><a id="creaUsu" style="display:none;" href="@Url.Action("AdicionarUsuario", "VistasWeb")">Crear</a></div>
+        </div>
+
+    </form>
+    <div id="result"></div>
+    <script>
+         $(document).ready(function () {
+
+        $("#btnEnviar").click(function () {
+            var login = {
+                Usuario: $("#username").val(),
+                Contrasena: $("#password").val()
+            };
+
+            $.ajax({
+                url: "/api/login",
+                type: "POST",
+                data: JSON.stringify(login),
+                contentType: "application/json",
+                success: function (response) {
+                    if (response.Codigo === 200) {
+                        $("#result").text(response.Mensaje);
+                        var usuarioId = response.UsuarioId;
+                        console.log(usuarioId)
+                        if (usuarioId != undefined) {
+                             var url = "@Url.Action("ResultUsuarios", "VistasWeb", new { usuarioId = "__usuarioId__" })";
+                             url = url.replace("__usuarioId__", usuarioId);
+                             window.location.href = url;
+                        }
+                        if (response.Mensaje === "Usuario no existente, por favor, cree un nuevo usuario y contraseña.") {
+                            var btn = document.getElementById('creaUsu');
+                            btn.addEventListener('click', function () {
+                                window.location.href = 'AdicionarUsuario';
+                            });
+                            document.getElementById("creaUsu").style.display = "block";
+                        }
+
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    });
+
+        @*$("#loginForm").submit(function (event) {
+            event.preventDefault();
+
+            var username = $("#username").val();
+            var password = $("#password").val();
+
+            $.ajax({
+                url: "/api/login",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ Usuario: username, Contrasena: password }),
+                success: function (response) {
+                    console.log(response)
+                    if (response.Codigo === 200) {
+                        var usuarioId = response.UsuarioId;
+                        var url = "@Url.Action("ResultUsuarios", "VistasWeb", new { usuarioId = "__usuarioId__" })";
+                        url = url.replace("__usuarioId__", usuarioId);
+
+                        window.location.href = url;
+                    }
+                    if (response.Codigo === 100) {
+                        $("#result").text(response.Mensaje);
+                        if (response.Mensaje === "Usuario no existente, por favor, cree un nuevo usuario y contraseña.") {
+                            var btn = document.getElementById('creaUsu');
+                            btn.addEventListener('click', function () {
+                                window.location.href = 'AdicionarUsuario';
+                            });
+                            document.getElementById("creaUsu").style.display = "block";
+                        }
+                    }
+
+                }
+            });
+        });*@
+    </script>
+</body>
+</html>
+

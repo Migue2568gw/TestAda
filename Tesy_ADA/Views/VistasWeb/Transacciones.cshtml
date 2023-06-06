@@ -1,0 +1,39 @@
+﻿<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<div class="container">
+    <h1>Transacciones</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>NombreUsuario</th>
+                <th>NombreProducto</th>
+                <th>Cantidad</th>
+                <th>FechaTransaccion</th>
+            </tr>
+        </thead>
+        <tbody id="transaccionesBody"></tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/api/gettransacciones',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                const transaccionesBody = $('#transaccionesBody');
+                data.forEach(transaccion => {
+                    const row = $('<tr></tr>');
+                    row.append(`<td>${transaccion.NombreUsuario}</td>`);
+                    row.append(`<td>${transaccion.NombreProducto}</td>`);
+                    row.append(`<td>${transaccion.Cantidad}</td>`);
+                    row.append(`<td>${transaccion.FechaTransaccion}</td>`);
+                    transaccionesBody.append(row);
+                });
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    });
+</script>

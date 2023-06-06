@@ -1,0 +1,65 @@
+﻿@using Tesy_ADA.Models
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Carrito de Compras</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" title="más opciones">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink((Session["usuarioEncontrado"] as Usuario)?.UsuarioLog, "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    @if ((Session["usuarioEncontrado"] as Usuario)?.Rol == 1)
+                    {
+                        <li>@Html.ActionLink("Productos", "Productos", "VistasWeb", new { area = "" }, null)</li>
+                        <li>@Html.ActionLink("Usuarios Existentes", "Usuarios", "VistasWeb", new { area = "" }, null)</li>
+                        <li>@Html.ActionLink("Transacciones Realizadas", "Transacciones", "VistasWeb", new { area = "" }, null)</li>
+                        <li><a onclick="CerrarSesionn()">Cerrar Sesion</a></li>
+                    }
+                    else if ((Session["usuarioEncontrado"] as Usuario)?.Rol == 2)
+                    {
+                        <li><a onclick="CerrarSesionn()">Cerrar Sesion</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <script>
+        function CerrarSesionn() {
+            $.ajax({
+                type: "POST",
+                url: "/VistasWeb/CerrarSe",
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    if (result) {
+                        window.location.replace("/VistasWeb/Login");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

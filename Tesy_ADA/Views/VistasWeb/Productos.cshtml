@@ -1,0 +1,41 @@
+﻿<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<div class="container">
+    <h1>Productos</h1>
+    <a href="@Url.Action("AdicionarProducto", "VistasWeb")" class="btn btn-primary">Agregar Producto</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cantidad disponible</th>
+                <th>Descripción</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="productosBody"></tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: '/api/getproducto',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                const productosBody = $('#productosBody');
+                data.forEach(productos => {
+                    const row = $('<tr></tr>');
+                    row.append(`<td>${productos.Nombre}</td>`);
+                    row.append(`<td>${productos.CantidadDisponible}</td>`);
+                    row.append(`<td>${productos.Descripcion}</td>`);
+                    row.append(`<td><a href="modificarProducto/${productos.ProductoId}">Modificar</a></td>`);
+                    productosBody.append(row);
+                });
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    });
+</script>

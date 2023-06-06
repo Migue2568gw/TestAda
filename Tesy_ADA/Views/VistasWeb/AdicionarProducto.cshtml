@@ -1,0 +1,45 @@
+﻿<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<br /><br />
+<form>
+    <div class="form-group">
+        <label for="Nombre">Nombre:</label>
+        <input type="text" class="form-control form-control-lg" id="Nombre" name="Nombre" required>
+    </div>
+
+    <div class="form-group">
+        <label for="CantidadDisponible">Cantidad Disponible:</label>
+        <input type="number" class="form-control form-control-lg" id="CantidadDisponible" name="CantidadDisponible" required>
+    </div>
+
+    <div class="form-group">
+        <label for="Descripcion">Descripción:</label>
+        <textarea class="form-control form-control-lg" id="Descripcion" name="Descripcion" rows="5"></textarea>
+    </div>
+
+    <button type="button" class="btn btn-primary btn-lg" id="btnEnviar">Enviar</button>
+</form>
+<script>
+    $(document).ready(function () {
+
+        $("#btnEnviar").click(function () {
+            var producto = {
+                Nombre: $("#Nombre").val(),
+                CantidadDisponible: parseInt($("#CantidadDisponible").val()),
+                Descripcion: $("#Descripcion").val()
+            };
+
+            $.ajax({
+                url: "/api/adicionarproducto",
+                type: "POST",
+                data: JSON.stringify(producto),
+                contentType: "application/json",
+                success: function (response) {
+                    window.location.href = "@Url.Action("Productos", "VistasWeb")";
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
